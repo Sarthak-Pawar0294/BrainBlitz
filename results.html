@@ -396,8 +396,14 @@
 
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/ai.js"></script>
   <script>
+    // ── Supabase Initialization
+    const supabaseUrl = 'https://gybfqbfuxzxalzzffevq.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5YmZxYmZ1eHp4YWx6emZmZXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM2ODYsImV4cCI6MjA5NDQ5OTY4Nn0.s7LMS-wHojSu3Bxv3jXY2fjQkuBZRQG-GSghPtHvoDA';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
     // ── Read session data
     const score        = parseInt(sessionStorage.getItem('bb_score')   || '0');
     const total        = parseInt(sessionStorage.getItem('bb_total')   || '10');
@@ -433,15 +439,18 @@
     gb.textContent = grade.label;
     gb.className   = `grade-badge ${grade.cls}`;
 
-    // ── Save to leaderboard
+    // ── Save to Supabase Leaderboard
     saveToLeaderboard(playerName, topic, score, total);
 
-    function saveToLeaderboard(name, topic, score, total) {
-      const entry = { name, topic, score, total, pct: Math.round((score/total)*100), date: new Date().toLocaleDateString('en-IN') };
-      const existing = JSON.parse(localStorage.getItem('bb_leaderboard') || '[]');
-      existing.unshift(entry);
-      const top20 = existing.slice(0, 20);
-      localStorage.setItem('bb_leaderboard', JSON.stringify(top20));
+    async function saveToLeaderboard(name, topic, score, total) {
+      try {
+        await supabase.from('leaderboard').insert([
+          { name: name, topic: topic, score: score, total: total }
+        ]);
+        console.log("Score successfully saved to Supabase!");
+      } catch (err) {
+        console.error("Failed to save score to Supabase:", err);
+      }
     }
 
     // ── Question breakdown
@@ -473,7 +482,6 @@
       list.appendChild(div);
     });
 
-    // If no breakdown data, show a simple message
     if (questions.length === 0) {
       list.innerHTML = '<p style="color:var(--muted);font-size:0.85rem">No breakdown data available. Play a quiz to see details here.</p>';
     }
@@ -518,6 +526,5 @@
       });
     }
   </script>
-
 </body>
 </html>
