@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BrainBlitz — Leaderboard</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    .lb-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 5rem;
+    }
+
+    /* ── HEADER ── */
+    .lb-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .lb-header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      font-weight: 900;
+      margin-bottom: 0.4rem;
+    }
+    .lb-header h1 span { color: var(--yellow); }
+    .lb-header p { color: var(--muted); font-size: 0.88rem; }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      animation: fadeUp 0.5s 0.05s ease both;
+    }
+
+    .filter-input {
+      flex: 1;
+      min-width: 180px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+      color: var(--white);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .filter-input:focus { border-color: rgba(245,197,24,0.4); }
+    .filter-input::placeholder { color: var(--muted); }
+
+    .clear-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.7rem 1.2rem;
+      color: var(--muted);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .clear-btn:hover { color: #f87171; border-color: rgba(248,113,113,0.3); }
+
+    /* ── TOP 3 PODIUM ── */
+    .podium {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.5s 0.1s ease both;
+    }
+
+    .podium-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .podium-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--white);
+      text-align: center;
+      max-width: 90px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .podium-score {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--yellow);
+    }
+
+    .podium-block {
+      width: 80px;
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+
+    .podium-1 .podium-block { height: 90px; background: linear-gradient(to top, rgba(245,197,24,0.2), rgba(245,197,24,0.05)); border: 1px solid rgba(245,197,24,0.3); }
+    .podium-2 .podium-block { height: 65px; background: linear-gradient(to top, rgba(192,192,192,0.15), rgba(192,192,192,0.03)); border: 1px solid rgba(255,255,255,0.1); }
+    .podium-3 .podium-block { height: 50px; background: linear-gradient(to top, rgba(205,127,50,0.15), rgba(205,127,50,0.03)); border: 1px solid rgba(205,127,50,0.2); }
+
+    /* ── TABLE ── */
+    .lb-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      animation: fadeUp 0.5s 0.15s ease both;
+    }
+
+    .lb-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .lb-table thead tr {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .lb-table th {
+      padding: 0.9rem 1.2rem;
+      text-align: left;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .lb-table td {
+      padding: 1rem 1.2rem;
+      font-size: 0.88rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--white);
+    }
+
+    .lb-table tbody tr:last-child td { border-bottom: none; }
+
+    .lb-table tbody tr {
+      transition: background 0.15s;
+    }
+    .lb-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+    .rank-cell {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      width: 50px;
+    }
+
+    .rank-1 { color: var(--yellow); }
+    .rank-2 { color: #c0c0c0; }
+    .rank-3 { color: #cd7f32; }
+    .rank-other { color: var(--muted); }
+
+    .name-cell { font-weight: 600; }
+
+    .topic-chip {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: inline-block;
+    }
+
+    .score-cell {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .pct-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .pct-bar-bg {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      min-width: 60px;
+    }
+
+    .pct-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--purple), var(--yellow));
+    }
+
+    .pct-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      min-width: 36px;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--muted);
+    }
+    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .empty-state h3 { font-size: 1rem; color: var(--white); margin-bottom: 0.5rem; }
+    .empty-state p { font-size: 0.84rem; }
+
+    /* ── BOTTOM ROW ── */
+    .lb-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+      animation: fadeUp 0.5s 0.2s ease both;
+    }
+
+    .lb-count { font-size: 0.8rem; color: var(--muted); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 500px) {
+      .lb-table th:nth-child(3),
+      .lb-table td:nth-child(3) { display: none; }
+      .lb-table th:nth-child(5),
+      .lb-table td:nth-child(5) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="logo">Brain<span>Blitz</span></a>
+    <div class="nav-links">
+      <a href="lobby.html" class="btn-nav">Play Now</a>
+    </div>
+  </nav>
+
+  <div class="lb-wrap">
+
+    <div class="lb-header">
+      <h1>🏆 Leader<span>board</span></h1>
+      <p>Top scores across all quizzes. Can you make it to #1?</p>
+    </div>
+
+    <div class="filter-bar">
+      <input class="filter-input" id="filterInput" type="text" placeholder="🔍 Filter by name or topic..."/>
+      <button class="clear-btn" onclick="clearLeaderboard()">🗑 Clear All</button>
+    </div>
+
+    <div class="podium" id="podium"></div>
+
+    <div class="lb-card">
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>Topic</th>
+            <th>Score</th>
+            <th>Accuracy</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="lbBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState" style="display:none">
+        <div class="empty-icon">🎯</div>
+        <h3>No scores yet</h3>
+        <p>Complete a quiz to appear on the leaderboard!</p>
+      </div>
+    </div>
+
+    <div class="lb-bottom">
+      <span class="lb-count" id="lbCount"></span>
+      <a href="lobby.html" class="btn-primary" style="font-size:0.85rem; padding:0.7rem 1.5rem;">⚡ Play a Quiz</a>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <script>
+    const supabaseUrl = 'https://gybfqbfuxzxalzzffevq.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5YmZxYmZ1eHp4YWx6emZmZXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM2ODYsImV4cCI6MjA5NDQ5OTY4Nn0.s7LMS-wHojSu3Bxv3jXY2fjQkuBZRQG-GSghPtHvoDA';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    let allEntries = [];
+
+    // Format the date nicely
+    function formatDate(isoString) {
+      const date = new Date(isoString);
+      return date.toLocaleDateString();
+    }
+
+    function renderPodium(entries) {
+      const podium = document.getElementById('podium');
+      podium.innerHTML = '';
+      if (entries.length === 0) return;
+
+      const medals = ['🥇','🥈','🥉'];
+      const order  = [1, 0, 2]; // show 2nd, 1st, 3rd
+      const classes = ['podium-2','podium-1','podium-3'];
+
+      order.forEach((idx, pos) => {
+        if (!entries[idx]) return;
+        const e = entries[idx];
+        const div = document.createElement('div');
+        div.className = `podium-item ${classes[pos]}`;
+        div.innerHTML = `
+          <div class="podium-name">${e.name}</div>
+          <div class="podium-score">${e.score}/${e.total}</div>
+          <div class="podium-block">${medals[idx]}</div>
+        `;
+        podium.appendChild(div);
+      });
+    }
+
+    function renderTable(entries) {
+      const tbody = document.getElementById('lbBody');
+      const empty = document.getElementById('emptyState');
+      const count = document.getElementById('lbCount');
+
+      tbody.innerHTML = '';
+      if (entries.length === 0) {
+        empty.style.display = 'block';
+        count.textContent = '';
+        return;
+      }
+
+      empty.style.display = 'none';
+      count.textContent = `${entries.length} score${entries.length !== 1 ? 's' : ''} recorded`;
+
+      entries.forEach((e, i) => {
+        const rank = i + 1;
+        const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-other';
+        const rankLabel = rank <= 3 ? ['🥇','🥈','🥉'][rank-1] : `#${rank}`;
+        const pct = Math.round((e.score / e.total) * 100);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="rank-cell ${rankClass}">${rankLabel}</td>
+          <td class="name-cell">${e.name}</td>
+          <td><span class="topic-chip">${e.topic}</span></td>
+          <td class="score-cell" style="color:var(--yellow)">${e.score}/${e.total}</td>
+          <td>
+            <div class="pct-bar-wrap">
+              <div class="pct-bar-bg">
+                <div class="pct-bar-fill" style="width:${pct}%"></div>
+              </div>
+              <span class="pct-label">${pct}%</span>
+            </div>
+          </td>
+          <td style="color:var(--muted); font-size:0.78rem">${formatDate(e.created_at)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function render(entries) {
+      renderPodium(entries);
+      renderTable(entries);
+    }
+
+    // Fetch data from Supabase
+    async function fetchLeaderboard() {
+      const { data, error } = await supabase
+        .from('leaderboard')
+        .select('*')
+        // Sort by score (highest first). If there's a tie, newer times win.
+        .order('score', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) {
+        console.error("Error fetching leaderboard:", error);
+        return;
+      }
+
+      allEntries = data;
+      render(allEntries);
+    }
+
+    // Filter functionality
+    document.getElementById('filterInput').addEventListener('input', function() {
+      const q = this.value.toLowerCase();
+      const filtered = allEntries.filter(e =>
+        e.name.toLowerCase().includes(q) || e.topic.toLowerCase().includes(q)
+      );
+      render(filtered);
+    });
+
+    // Replace the "Clear" button logic since we don't want users deleting the global DB
+    function clearLeaderboard() {
+       alert("This is a global leaderboard now! Scores cannot be cleared locally.");
+    }
+
+    // Load data when page opens
+    fetchLeaderboard();
+  </script>
+
+</body>
+</html>

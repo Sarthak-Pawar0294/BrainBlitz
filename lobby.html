@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BrainBlitz — Setup Quiz</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    .lobby-wrap {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 5rem;
+    }
+
+    .lobby-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .lobby-header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      font-weight: 900;
+      margin-bottom: 0.5rem;
+    }
+    .lobby-header h1 span { color: var(--yellow); }
+
+    .lobby-header p {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* ── FORM CARD ── */
+    .lobby-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      animation: fadeUp 0.5s 0.1s ease both;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .field-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    .field-input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1.1rem;
+      color: var(--white);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    .field-input:focus { border-color: rgba(245,197,24,0.5); }
+    .field-input::placeholder { color: var(--muted); }
+
+    /* ── PRESET TOPICS ── */
+    .preset-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .preset-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .chip {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+    .chip:hover, .chip.active {
+      background: var(--yellow-glow);
+      border-color: rgba(245,197,24,0.4);
+      color: var(--yellow);
+    }
+
+    /* ── OPTION BUTTONS (difficulty / count) ── */
+    .option-row {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .opt-btn {
+      flex: 1;
+      min-width: 80px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 0.5rem;
+      text-align: center;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--muted);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .opt-btn:hover { border-color: rgba(245,197,24,0.3); color: var(--white); }
+    .opt-btn.selected {
+      background: var(--yellow-glow);
+      border-color: rgba(245,197,24,0.5);
+      color: var(--yellow);
+    }
+
+    .opt-btn .opt-sub {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 400;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── SUBMIT ── */
+    .submit-btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--yellow);
+      color: #08090f;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      letter-spacing: 0.03em;
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(245,197,24,0.3);
+    }
+    .submit-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* ── LOADING STATE ── */
+    .submit-btn.loading {
+      background: #2a2d3e;
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    /* ── ERROR ── */
+    .error-msg {
+      display: none;
+      background: rgba(248,113,113,0.08);
+      border: 1px solid rgba(248,113,113,0.25);
+      color: #f87171;
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      font-size: 0.84rem;
+    }
+    .error-msg.show { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="logo">Brain<span>Blitz</span></a>
+    <div class="nav-links">
+      <a href="leaderboard.html">🏆 Leaderboard</a>
+    </div>
+  </nav>
+
+  <div class="lobby-wrap">
+
+    <div class="lobby-header">
+      <h1>Set Up Your <span>Quiz</span></h1>
+      <p>Choose a topic, set the difficulty, and let AI do the rest.</p>
+    </div>
+
+    <div class="lobby-card">
+
+      <!-- NAME -->
+      <div class="field-group">
+        <label class="field-label">Your Name</label>
+        <input
+          class="field-input"
+          id="playerName"
+          type="text"
+          placeholder="e.g. Sarthak"
+          maxlength="24"
+        />
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- TOPIC -->
+      <div class="field-group">
+        <label class="field-label">Quiz Topic</label>
+        <input
+          class="field-input"
+          id="topicInput"
+          type="text"
+          placeholder="e.g. Indian History, Cricket, Python..."
+          maxlength="80"
+        />
+        <p class="preset-label" style="margin-top:0.8rem">Or pick a category:</p>
+        <div class="preset-chips" id="presetChips">
+          <div class="chip" data-topic="General Knowledge">🌍 General Knowledge</div>
+          <div class="chip" data-topic="Science">🔬 Science</div>
+          <div class="chip" data-topic="Indian History">🏛️ Indian History</div>
+          <div class="chip" data-topic="Cricket">🏏 Cricket</div>
+          <div class="chip" data-topic="Technology">💻 Technology</div>
+          <div class="chip" data-topic="Geography">🗺️ Geography</div>
+          <div class="chip" data-topic="Bollywood">🎬 Bollywood</div>
+          <div class="chip" data-topic="Mathematics">📐 Mathematics</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- DIFFICULTY -->
+      <div class="field-group">
+        <label class="field-label">Difficulty</label>
+        <div class="option-row" id="difficultyRow">
+          <div class="opt-btn selected" data-value="easy">
+            😊 Easy
+            <span class="opt-sub">Beginner friendly</span>
+          </div>
+          <div class="opt-btn" data-value="medium">
+            🔥 Medium
+            <span class="opt-sub">Some challenge</span>
+          </div>
+          <div class="opt-btn" data-value="hard">
+            💀 Hard
+            <span class="opt-sub">Expert level</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUESTION COUNT -->
+      <div class="field-group">
+        <label class="field-label">Number of Questions</label>
+        <div class="option-row" id="countRow">
+          <div class="opt-btn" data-value="5">
+            5
+            <span class="opt-sub">Quick</span>
+          </div>
+          <div class="opt-btn selected" data-value="10">
+            10
+            <span class="opt-sub">Standard</span>
+          </div>
+          <div class="opt-btn" data-value="15">
+            15
+            <span class="opt-sub">Full Quiz</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- ERROR -->
+      <div class="error-msg" id="errorMsg">
+        ⚠️ Please enter your name and a quiz topic before continuing.
+      </div>
+
+      <!-- SUBMIT -->
+      <button class="submit-btn" id="startBtn" onclick="startQuiz()">
+        ⚡ Generate Quiz with AI
+      </button>
+
+    </div>
+  </div>
+
+  <script>
+    let selectedDifficulty = 'easy';
+    let selectedCount = 10;
+
+    // ── Preset chips
+    document.querySelectorAll('#presetChips .chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#presetChips .chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        document.getElementById('topicInput').value = chip.dataset.topic;
+      });
+    });
+
+    // ── Difficulty selector
+    document.querySelectorAll('#difficultyRow .opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#difficultyRow .opt-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedDifficulty = btn.dataset.value;
+      });
+    });
+
+    // ── Question count selector
+    document.querySelectorAll('#countRow .opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#countRow .opt-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedCount = parseInt(btn.dataset.value);
+      });
+    });
+
+    // ── Start quiz
+    function startQuiz() {
+      const name  = document.getElementById('playerName').value.trim();
+      const topic = document.getElementById('topicInput').value.trim();
+      const error = document.getElementById('errorMsg');
+      const btn   = document.getElementById('startBtn');
+
+      if (!name || !topic) {
+        error.classList.add('show');
+        return;
+      }
+
+      error.classList.remove('show');
+
+      // Save to sessionStorage for quiz.html to read
+      sessionStorage.setItem('bb_name',       name);
+      sessionStorage.setItem('bb_topic',      topic);
+      sessionStorage.setItem('bb_difficulty', selectedDifficulty);
+      sessionStorage.setItem('bb_count',      selectedCount);
+
+      // Button loading state
+      btn.textContent = '⏳ Generating your quiz...';
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      // Navigate to quiz page
+      setTimeout(() => { window.location.href = 'quiz.html'; }, 600);
+    }
+  </script>
+
+</body>
+</html>

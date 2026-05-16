@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BrainBlitz — Playing</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    #loadingScreen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      text-align: center;
+      padding: 2rem;
+    }
+    .loading-logo { font-family: 'Orbitron', sans-serif; font-size: 1.6rem; font-weight: 900; }
+    .loading-logo span { color: var(--yellow); }
+    .spinner { width: 52px; height: 52px; border: 3px solid var(--border); border-top-color: var(--yellow); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 1.05rem; font-weight: 500; color: var(--white); }
+    .loading-sub { font-size: 0.84rem; color: var(--muted); }
+    .loading-dots span { display: inline-block; animation: blink 1.2s infinite; }
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+
+    #quizScreen { display: none; max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+
+    .quiz-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
+    .quiz-topic-badge { background: var(--purple-glow); border: 1px solid rgba(124,77,255,0.3); color: #a78bfa; font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.8rem; border-radius: 999px; letter-spacing: 0.06em; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .quiz-score-badge { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--yellow); }
+
+    .progress-wrap { margin-bottom: 0.5rem; }
+    .progress-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); margin-bottom: 0.4rem; }
+    .progress-bar-bg { height: 5px; background: var(--border); border-radius: 999px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--purple), var(--yellow)); border-radius: 999px; transition: width 0.4s ease; }
+
+    .timer-wrap { display: flex; justify-content: center; margin: 1.5rem 0; }
+    .timer-circle { position: relative; width: 80px; height: 80px; }
+    .timer-svg { transform: rotate(-90deg); width: 80px; height: 80px; }
+    .timer-bg { fill: none; stroke: var(--border); stroke-width: 5; }
+    .timer-arc { fill: none; stroke: var(--yellow); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 220; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear, stroke 0.3s; }
+    .timer-arc.warning { stroke: #f87171; }
+    .timer-num { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: 'Orbitron', sans-serif; font-size: 1.3rem; font-weight: 900; color: var(--yellow); }
+    .timer-num.warning { color: #f87171; }
+
+    .question-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; margin-bottom: 1.2rem; position: relative; overflow: hidden; animation: fadeUp 0.35s ease; }
+    .question-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg, var(--purple), var(--yellow)); }
+    .question-num { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.8rem; }
+    .question-text { font-size: 1.05rem; font-weight: 600; line-height: 1.55; color: var(--white); }
+
+    .options-grid { display: flex; flex-direction: column; gap: 0.7rem; }
+
+    .option-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.9rem 1.2rem;
+      text-align: left;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--white);
+      cursor: pointer;
+      transition: all 0.18s;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      width: 100%;
+      position: relative;
+      z-index: 10;
+    }
+    .option-btn:hover:not(:disabled) { border-color: rgba(245,197,24,0.4); background: var(--yellow-glow); transform: translateX(4px); }
+    .opt-letter { min-width: 28px; height: 28px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: var(--muted); flex-shrink: 0; }
+    .option-btn.correct { background: rgba(74,222,128,0.1) !important; border-color: rgba(74,222,128,0.5) !important; color: #4ade80 !important; }
+    .option-btn.correct .opt-letter { background: rgba(74,222,128,0.2); border-color: rgba(74,222,128,0.4); color: #4ade80; }
+    .option-btn.wrong { background: rgba(248,113,113,0.08) !important; border-color: rgba(248,113,113,0.4) !important; color: #f87171 !important; }
+    .option-btn.wrong .opt-letter { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.3); color: #f87171; }
+    .option-btn:disabled { cursor: not-allowed; }
+
+    .feedback-bar { display: none; border-radius: 10px; padding: 0.9rem 1.2rem; font-size: 0.88rem; font-weight: 500; margin-top: 0.8rem; }
+    .feedback-bar.correct-fb { display: flex; gap: 0.6rem; background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.25); color: #4ade80; }
+    .feedback-bar.wrong-fb { display: flex; flex-direction: column; gap: 0.3rem; background: rgba(248,113,113,0.07); border: 1px solid rgba(248,113,113,0.25); color: #f87171; }
+    .correct-ans { color: #4ade80; font-weight: 600; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  </style>
+</head>
+<body>
+
+  <!-- LOADING -->
+  <div id="loadingScreen">
+    <div class="loading-logo">Brain<span>Blitz</span></div>
+    <div class="spinner"></div>
+    <div class="loading-text">AI is generating your quiz
+      <span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
+    </div>
+    <div class="loading-sub" id="loadingTopic">Preparing questions</div>
+  </div>
+
+  <!-- ERROR -->
+  <div id="errorScreen" style="display:none; min-height:100vh; flex-direction:column; align-items:center; justify-content:center; gap:1rem; text-align:center; padding:2rem;">
+    <div style="font-size:3rem">⚠️</div>
+    <div style="font-family:'Orbitron',sans-serif; font-size:1.4rem; font-weight:900;">Something went wrong</div>
+    <div style="color:var(--muted); font-size:0.9rem; max-width:400px;" id="errorDetail">Could not generate quiz.</div>
+    <a href="lobby.html" class="btn-primary" style="margin-top:1rem">← Try Again</a>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quizScreen">
+    <div class="quiz-topbar">
+      <div class="quiz-topic-badge" id="topicBadge">Topic</div>
+      <div class="quiz-score-badge">Score: <span id="scoreDisplay">0</span></div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-labels">
+        <span id="progressLabel">Question 1 of 10</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="timer-wrap">
+      <div class="timer-circle">
+        <svg class="timer-svg" viewBox="0 0 80 80">
+          <circle class="timer-bg" cx="40" cy="40" r="35"/>
+          <circle class="timer-arc" id="timerArc" cx="40" cy="40" r="35"/>
+        </svg>
+        <div class="timer-num" id="timerNum">20</div>
+      </div>
+    </div>
+
+    <div class="question-card" id="questionCard">
+      <div class="question-num" id="questionNum">Question 1</div>
+      <div class="question-text" id="questionText">Loading...</div>
+    </div>
+
+    <div class="options-grid" id="optionsGrid"></div>
+    <div class="feedback-bar" id="feedbackBar"></div>
+  </div>
+
+  <script src="js/ai.js"></script>
+  <script>
+    // ── Config
+    const TIMER_MAX     = 20;
+    const CIRCUMFERENCE = 2 * Math.PI * 35;
+
+    // ── State
+    let questions      = [];
+    let currentIndex   = 0;
+    let score          = 0;
+    let timerInterval  = null;
+    let timeLeft       = TIMER_MAX;
+    let answered       = false;
+    let answerLog      = [];
+    let wrongQuestions = [];
+
+    // ── Session
+    const playerName = sessionStorage.getItem('bb_name')       || 'Player';
+    const topic      = sessionStorage.getItem('bb_topic')      || 'General Knowledge';
+    const difficulty = sessionStorage.getItem('bb_difficulty') || 'medium';
+    const count      = parseInt(sessionStorage.getItem('bb_count') || '10');
+
+    document.getElementById('loadingTopic').textContent = `"${topic}" · ${difficulty} · ${count} questions`;
+
+    // ── Normalize strings for comparison
+    function norm(str) {
+      return String(str).trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    // ── Strip AI-added letter prefixes like "A." "B." "C." "1." from option text
+    function cleanOpt(opt) {
+      return String(opt)
+        .trim()
+        .replace(/^[A-Da-d][\.\)]\s*/i, '')  // removes "A." "B)" etc
+        .replace(/^\d+[\.\)]\s*/, '')          // removes "1." "2)" etc
+        .trim();
+    }
+
+    // ── Boot
+    init();
+
+    async function init() {
+      try {
+        questions = await generateQuiz(topic, difficulty, count);
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('quizScreen').style.display   = 'block';
+        document.getElementById('topicBadge').textContent     = `🎯 ${topic}`;
+        showQuestion();
+      } catch (err) {
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('errorScreen').style.display  = 'flex';
+        document.getElementById('errorDetail').textContent    = err.message || 'Check your API key in js/ai.js';
+      }
+    }
+
+    // ── Show question
+    function showQuestion() {
+      answered = false;
+      clearInterval(timerInterval);
+      timerInterval = null;
+
+      const q       = questions[currentIndex];
+      const letters = ['A', 'B', 'C', 'D'];
+
+      // Progress
+      const pct = Math.round((currentIndex / questions.length) * 100);
+      document.getElementById('progressLabel').textContent = `Question ${currentIndex + 1} of ${questions.length}`;
+      document.getElementById('progressPct').textContent   = pct + '%';
+      document.getElementById('progressFill').style.width  = pct + '%';
+
+      // Question
+      document.getElementById('questionNum').textContent  = `Question ${currentIndex + 1}`;
+      document.getElementById('questionText').textContent = q.question;
+
+      // Clear feedback
+      const fb    = document.getElementById('feedbackBar');
+      fb.className = 'feedback-bar';
+      fb.innerHTML = '';
+
+      // Build options
+      const grid = document.getElementById('optionsGrid');
+      grid.innerHTML = '';
+
+      // Shuffle and clean options
+      const shuffled = [...q.options].sort(() => Math.random() - 0.5);
+      const cleanAnswer = cleanOpt(q.answer);
+
+      shuffled.forEach((opt, i) => {
+        const cleanedOpt = cleanOpt(opt);
+
+        const btn = document.createElement('button');
+        btn.type        = 'button';
+        btn.className   = 'option-btn';
+        btn.dataset.opt = cleanedOpt;
+
+        // Letter badge — only A B C D, nothing else
+        const letterEl      = document.createElement('span');
+        letterEl.className   = 'opt-letter';
+        letterEl.textContent = letters[i];
+
+        // Option text — clean, no prefix
+        const textEl      = document.createElement('span');
+        textEl.textContent = cleanedOpt;
+
+        btn.appendChild(letterEl);
+        btn.appendChild(textEl);
+
+        btn.addEventListener('click', function() {
+          selectAnswer(cleanedOpt, cleanAnswer, q.question);
+        });
+
+        grid.appendChild(btn);
+      });
+
+      // Start timer after short delay
+      resetTimer();
+      setTimeout(() => {
+        if (!answered) startTimer(cleanAnswer, q.question);
+      }, 300);
+    }
+
+    // ── Handle answer
+    function selectAnswer(chosen, correct, questionText) {
+      if (answered) return;
+      answered = true;
+
+      clearInterval(timerInterval);
+      timerInterval = null;
+
+      const isCorrect = norm(chosen) === norm(correct);
+
+      // Log
+      answerLog.push({ chosen, correct, isCorrect });
+
+      // Style buttons
+      document.querySelectorAll('.option-btn').forEach(btn => {
+        btn.disabled = true;
+        const val    = String(btn.dataset.opt || '').trim();
+        if (norm(val) === norm(correct))                   btn.classList.add('correct');
+        if (!isCorrect && norm(val) === norm(chosen))      btn.classList.add('wrong');
+      });
+
+      // Feedback
+      const fb = document.getElementById('feedbackBar');
+      if (isCorrect) {
+        score++;
+        document.getElementById('scoreDisplay').textContent = score;
+        fb.className = 'feedback-bar correct-fb';
+        fb.innerHTML = '✓ Correct!';
+      } else {
+        wrongQuestions.push(questionText);
+        fb.className = 'feedback-bar wrong-fb';
+        fb.innerHTML  = chosen === '__timeout__'
+          ? `⏱ Time's up! &nbsp;<span class="correct-ans">Answer: ${correct}</span>`
+          : `✗ Wrong &nbsp;<span class="correct-ans">Correct: ${correct}</span>`;
+      }
+
+      setTimeout(nextQuestion, 2000);
+    }
+
+    // ── Advance
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex >= questions.length) {
+        endQuiz();
+      } else {
+        const card = document.getElementById('questionCard');
+        card.style.animation = 'none';
+        card.offsetHeight;
+        card.style.animation = '';
+        showQuestion();
+      }
+    }
+
+    // ── Timer
+    function resetTimer() {
+      timeLeft = TIMER_MAX;
+      const arc = document.getElementById('timerArc');
+      const num = document.getElementById('timerNum');
+      arc.style.strokeDashoffset = '0';
+      arc.classList.remove('warning');
+      num.classList.remove('warning');
+      num.textContent = TIMER_MAX;
+    }
+
+    function startTimer(correctAnswer, questionText) {
+      const arc = document.getElementById('timerArc');
+      const num = document.getElementById('timerNum');
+
+      timerInterval = setInterval(() => {
+        if (answered) { clearInterval(timerInterval); timerInterval = null; return; }
+
+        timeLeft--;
+        num.textContent            = timeLeft;
+        arc.style.strokeDashoffset = CIRCUMFERENCE * (1 - timeLeft / TIMER_MAX);
+
+        if (timeLeft <= 6) {
+          arc.classList.add('warning');
+          num.classList.add('warning');
+        }
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          selectAnswer('__timeout__', correctAnswer, questionText);
+        }
+      }, 1000);
+    }
+
+    // ── Save & redirect
+    function endQuiz() {
+      clearInterval(timerInterval);
+      sessionStorage.setItem('bb_score',   score);
+      sessionStorage.setItem('bb_total',   questions.length);
+      sessionStorage.setItem('bb_wrong',   JSON.stringify(wrongQuestions));
+      sessionStorage.setItem('bb_player',  playerName);
+      sessionStorage.setItem('bb_topic_r', topic);
+      sessionStorage.setItem('bb_qs',      JSON.stringify(questions));
+      sessionStorage.setItem('bb_answers', JSON.stringify(answerLog));
+      window.location.href = 'results.html';
+    }
+  </script>
+
+</body>
+</html>
