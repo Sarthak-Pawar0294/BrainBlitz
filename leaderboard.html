@@ -388,7 +388,7 @@
 
     // Fetch data from Supabase
     async function fetchLeaderboard() {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('leaderboard')
         .select('*')
         // Sort by score (highest first). If there's a tie, newer times win.
