@@ -7,321 +7,57 @@
   <link rel="stylesheet" href="css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
-    .results-wrap {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 3rem 1.5rem 5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    /* ── SCORE CARD ── */
-    .score-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2.5rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      animation: fadeUp 0.5s ease both;
-    }
-
-    .score-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--purple), var(--yellow));
-    }
-
-    .score-label {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--muted);
-      margin-bottom: 0.8rem;
-    }
-
-    .score-big {
-      font-family: 'Orbitron', sans-serif;
-      font-size: clamp(3.5rem, 10vw, 5.5rem);
-      font-weight: 900;
-      line-height: 1;
-      margin-bottom: 0.3rem;
-    }
-
+    .results-wrap { max-width: 680px; margin: 0 auto; padding: 3rem 1.5rem 5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    .score-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; text-align: center; position: relative; overflow: hidden; animation: fadeUp 0.5s ease both; }
+    .score-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--purple), var(--yellow)); }
+    .score-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 0.8rem; }
+    .score-big { font-family: 'Orbitron', sans-serif; font-size: clamp(3.5rem, 10vw, 5.5rem); font-weight: 900; line-height: 1; margin-bottom: 0.3rem; }
     .score-big .score-num { color: var(--yellow); }
     .score-big .score-sep { color: var(--muted); font-size: 0.6em; }
     .score-big .score-total { color: var(--muted); }
-
-    .score-pct {
-      font-size: 1rem;
-      color: var(--muted);
-      margin-bottom: 1.5rem;
-    }
-
-    .score-emoji {
-      font-size: 2.5rem;
-      margin-bottom: 0.8rem;
-      display: block;
-    }
-
-    .grade-badge {
-      display: inline-block;
-      padding: 0.4rem 1.2rem;
-      border-radius: 999px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
+    .score-pct { font-size: 1rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .score-emoji { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
+    .grade-badge { display: inline-block; padding: 0.4rem 1.2rem; border-radius: 999px; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
     .grade-s { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
     .grade-a { background: rgba(245,197,24,0.15); color: var(--yellow); border: 1px solid rgba(245,197,24,0.3); }
     .grade-b { background: rgba(96,165,250,0.15); color: #60a5fa; border: 1px solid rgba(96,165,250,0.3); }
     .grade-c { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
-
-    .meta-row {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin-top: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .meta-item {
-      text-align: center;
-    }
-    .meta-val {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--white);
-    }
-    .meta-key {
-      font-size: 0.72rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-top: 0.2rem;
-    }
-
-    /* ── AI SUMMARY ── */
-    .ai-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.8rem;
-      animation: fadeUp 0.5s 0.1s ease both;
-    }
-
-    .ai-card-header {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin-bottom: 1rem;
-    }
-
-    .ai-badge {
-      background: var(--purple-glow);
-      border: 1px solid rgba(124,77,255,0.3);
-      color: #a78bfa;
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 0.25rem 0.7rem;
-      border-radius: 999px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .ai-summary-text {
-      font-size: 0.92rem;
-      color: var(--muted);
-      line-height: 1.75;
-      font-style: italic;
-    }
-
-    .ai-loading {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      color: var(--muted);
-      font-size: 0.85rem;
-    }
-
-    .ai-spinner {
-      width: 16px; height: 16px;
-      border: 2px solid var(--border);
-      border-top-color: #a78bfa;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      flex-shrink: 0;
-    }
-
+    .meta-row { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap; }
+    .meta-item { text-align: center; }
+    .meta-val { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--white); }
+    .meta-key { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.2rem; }
+    .ai-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.8rem; animation: fadeUp 0.5s 0.1s ease both; }
+    .ai-card-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; }
+    .ai-badge { background: var(--purple-glow); border: 1px solid rgba(124,77,255,0.3); color: #a78bfa; font-size: 0.7rem; font-weight: 700; padding: 0.25rem 0.7rem; border-radius: 999px; letter-spacing: 0.06em; text-transform: uppercase; }
+    .ai-summary-text { font-size: 0.92rem; color: var(--muted); line-height: 1.75; font-style: italic; }
+    .ai-loading { display: flex; align-items: center; gap: 0.6rem; color: var(--muted); font-size: 0.85rem; }
+    .ai-spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: #a78bfa; border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── ACTION BUTTONS ── */
-    .action-row {
-      display: flex;
-      gap: 0.8rem;
-      flex-wrap: wrap;
-      animation: fadeUp 0.5s 0.15s ease both;
-    }
-
-    .action-row a, .action-row button {
-      flex: 1;
-      min-width: 140px;
-      text-align: center;
-      padding: 0.85rem 1rem;
-      border-radius: 8px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.88rem;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-      border: none;
-    }
-
-    .btn-play-again {
-      background: var(--yellow);
-      color: #08090f;
-    }
-    .btn-play-again:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(245,197,24,0.3);
-    }
-
-    .btn-leaderboard {
-      background: var(--card);
-      color: var(--white);
-      border: 1px solid var(--border) !important;
-    }
+    .action-row { display: flex; gap: 0.8rem; flex-wrap: wrap; animation: fadeUp 0.5s 0.15s ease both; }
+    .action-row a, .action-row button { flex: 1; min-width: 140px; text-align: center; padding: 0.85rem 1rem; border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; border: none; }
+    .btn-play-again { background: var(--yellow); color: #08090f; }
+    .btn-play-again:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,197,24,0.3); }
+    .btn-leaderboard { background: var(--card); color: var(--white); border: 1px solid var(--border) !important; }
     .btn-leaderboard:hover { border-color: rgba(255,255,255,0.2) !important; }
-
-    .btn-share {
-      background: var(--card);
-      color: var(--white);
-      border: 1px solid var(--border) !important;
-    }
+    .btn-share { background: var(--card); color: var(--white); border: 1px solid var(--border) !important; }
     .btn-share:hover { border-color: rgba(255,255,255,0.2) !important; }
-
-    /* ── BREAKDOWN ── */
-    .breakdown-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.8rem;
-      animation: fadeUp 0.5s 0.2s ease both;
-    }
-
-    .breakdown-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 700;
-      margin-bottom: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .q-item {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem 1.2rem;
-      margin-bottom: 0.7rem;
-      background: var(--bg);
-      transition: border-color 0.2s;
-    }
-
+    .breakdown-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.8rem; animation: fadeUp 0.5s 0.2s ease both; }
+    .breakdown-title { font-family: 'Orbitron', sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
+    .q-item { border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 0.7rem; background: var(--bg); transition: border-color 0.2s; }
     .q-item.correct-q { border-color: rgba(74,222,128,0.25); }
     .q-item.wrong-q   { border-color: rgba(248,113,113,0.2); }
-
-    .q-item-top {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.8rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .q-status-icon {
-      font-size: 1rem;
-      flex-shrink: 0;
-      margin-top: 0.1rem;
-    }
-
-    .q-text {
-      font-size: 0.88rem;
-      font-weight: 500;
-      line-height: 1.5;
-      color: var(--white);
-    }
-
-    .q-answer-row {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-left: 1.8rem;
-    }
-
-    .q-ans-chip {
-      font-size: 0.75rem;
-      padding: 0.2rem 0.7rem;
-      border-radius: 4px;
-      font-weight: 500;
-    }
-
-    .q-ans-correct {
-      background: rgba(74,222,128,0.1);
-      color: #4ade80;
-    }
-
-    .q-ans-wrong {
-      background: rgba(248,113,113,0.1);
-      color: #f87171;
-      text-decoration: line-through;
-    }
-
-    .explain-btn {
-      margin-left: 1.8rem;
-      margin-top: 0.6rem;
-      background: none;
-      border: 1px solid var(--border);
-      color: #a78bfa;
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.75rem;
-      padding: 0.3rem 0.8rem;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: border-color 0.2s;
-    }
+    .q-item-top { display: flex; align-items: flex-start; gap: 0.8rem; margin-bottom: 0.5rem; }
+    .q-status-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .q-text { font-size: 0.88rem; font-weight: 500; line-height: 1.5; color: var(--white); }
+    .q-answer-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-left: 1.8rem; }
+    .q-ans-chip { font-size: 0.75rem; padding: 0.2rem 0.7rem; border-radius: 4px; font-weight: 500; }
+    .q-ans-correct { background: rgba(74,222,128,0.1); color: #4ade80; }
+    .q-ans-wrong { background: rgba(248,113,113,0.1); color: #f87171; text-decoration: line-through; }
+    .explain-btn { margin-left: 1.8rem; margin-top: 0.6rem; background: none; border: 1px solid var(--border); color: #a78bfa; font-family: 'Outfit', sans-serif; font-size: 0.75rem; padding: 0.3rem 0.8rem; border-radius: 6px; cursor: pointer; transition: border-color 0.2s; }
     .explain-btn:hover { border-color: rgba(124,77,255,0.4); }
-
-    .explain-text {
-      margin-left: 1.8rem;
-      margin-top: 0.6rem;
-      font-size: 0.8rem;
-      color: var(--muted);
-      line-height: 1.65;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 0.7rem 0.9rem;
-      display: none;
-      animation: fadeUp 0.3s ease;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(14px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 500px) {
-      .meta-row { gap: 1rem; }
-      .action-row { flex-direction: column; }
-    }
+    .explain-text { margin-left: 1.8rem; margin-top: 0.6rem; font-size: 0.8rem; color: var(--muted); line-height: 1.65; background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 0.7rem 0.9rem; display: none; animation: fadeUp 0.3s ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 500px) { .meta-row { gap: 1rem; } .action-row { flex-direction: column; } }
   </style>
 </head>
 <body>
@@ -335,7 +71,6 @@
 
   <div class="results-wrap">
 
-    <!-- SCORE CARD -->
     <div class="score-card">
       <div class="score-label">Quiz Complete</div>
       <span class="score-emoji" id="scoreEmoji">🎉</span>
@@ -344,7 +79,7 @@
         <span class="score-sep"> / </span>
         <span class="score-total" id="scoreTotal">10</span>
       </div>
-      <div class="score-pct" id="scorePct">0%</div>
+      <div class="score-pct" id="scorePct">0% accuracy</div>
       <div class="grade-badge grade-a" id="gradeBadge">Loading...</div>
 
       <div class="meta-row">
@@ -367,7 +102,6 @@
       </div>
     </div>
 
-    <!-- AI SUMMARY -->
     <div class="ai-card">
       <div class="ai-card-header">
         <span>🤖</span>
@@ -381,14 +115,12 @@
       </div>
     </div>
 
-    <!-- ACTION BUTTONS -->
     <div class="action-row">
       <a href="lobby.html" class="btn-play-again">⚡ Play Again</a>
       <a href="leaderboard.html" class="btn-leaderboard">🏆 Leaderboard</a>
       <button class="btn-share" onclick="shareScore()">📋 Copy Score</button>
     </div>
 
-    <!-- QUESTION BREAKDOWN -->
     <div class="breakdown-card">
       <div class="breakdown-title">📋 Question Breakdown</div>
       <div id="breakdownList"></div>
@@ -398,34 +130,30 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/ai.js"></script>
+  
   <script>
-    // ── Supabase Initialization
-    const supabaseUrl = 'https://gybfqbfuxzxalzzffevq.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5YmZxYmZ1eHp4YWx6emZmZXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM2ODYsImV4cCI6MjA5NDQ5OTY4Nn0.s7LMS-wHojSu3Bxv3jXY2fjQkuBZRQG-GSghPtHvoDA';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-    // ── Read session data
+    // 1. SAFELY READ SESSION DATA
     const score        = parseInt(sessionStorage.getItem('bb_score')   || '0');
     const total        = parseInt(sessionStorage.getItem('bb_total')   || '10');
-    const wrongQ       = JSON.parse(sessionStorage.getItem('bb_wrong') || '[]');
-    const playerName   = sessionStorage.getItem('bb_player')           || 'Player';
-    const topic        = sessionStorage.getItem('bb_topic_r')          || 'General Knowledge';
-    const questions    = JSON.parse(sessionStorage.getItem('bb_qs')    || '[]');
-    const allAnswers   = JSON.parse(sessionStorage.getItem('bb_answers')|| '[]');
+    let wrongQ = [], questions = [], allAnswers = [];
+    
+    try { wrongQ = JSON.parse(sessionStorage.getItem('bb_wrong') || '[]'); } catch(e){}
+    try { questions = JSON.parse(sessionStorage.getItem('bb_qs') || '[]'); } catch(e){}
+    try { allAnswers = JSON.parse(sessionStorage.getItem('bb_answers')|| '[]'); } catch(e){}
+    
+    const playerName   = sessionStorage.getItem('bb_player')  || 'Player';
+    const topic        = sessionStorage.getItem('bb_topic_r') || 'General Knowledge';
+    const pct          = total > 0 ? Math.round((score / total) * 100) : 0;
 
-    const pct = Math.round((score / total) * 100);
-
-    // ── Grade
     function getGrade(p) {
       if (p >= 90) return { label: '🔥 Outstanding', cls: 'grade-s', emoji: '🔥' };
       if (p >= 70) return { label: '⭐ Great Job',   cls: 'grade-a', emoji: '⭐' };
       if (p >= 50) return { label: '👍 Good Try',    cls: 'grade-b', emoji: '👍' };
       return             { label: '💪 Keep Going',   cls: 'grade-c', emoji: '💪' };
     }
-
     const grade = getGrade(pct);
 
-    // ── Populate score card
+    // 2. UPDATE DOM IMMEDIATELY (Before any database stuff can crash it)
     document.getElementById('scoreNum').textContent   = score;
     document.getElementById('scoreTotal').textContent = total;
     document.getElementById('scorePct').textContent   = pct + '% accuracy';
@@ -439,23 +167,30 @@
     gb.textContent = grade.label;
     gb.className   = `grade-badge ${grade.cls}`;
 
-    // ── Save to Supabase Leaderboard
-    saveToLeaderboard(playerName, topic, score, total);
-
+    // 3. SECURE SUPABASE INITIALIZATION
     async function saveToLeaderboard(name, topic, score, total) {
+      // Prevent saving if the user just randomly refreshed the page
+      if (!sessionStorage.getItem('bb_topic_r')) return; 
+
       try {
-        await supabase.from('leaderboard').insert([
+        if (!window.supabase) throw new Error("Supabase script failed to load");
+        
+        const supabaseUrl = 'https://gybfqbfuxzxalzzffevq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5YmZxYmZ1eHp4YWx6emZmZXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM2ODYsImV4cCI6MjA5NDQ5OTY4Nn0.s7LMS-wHojSu3Bxv3jXY2fjQkuBZRQG-GSghPtHvoDA';
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        await supabaseClient.from('leaderboard').insert([
           { name: name, topic: topic, score: score, total: total }
         ]);
-        console.log("Score successfully saved to Supabase!");
+        console.log("Score pushed to live database!");
       } catch (err) {
-        console.error("Failed to save score to Supabase:", err);
+        console.error("Leaderboard Error:", err);
       }
     }
+    saveToLeaderboard(playerName, topic, score, total);
 
-    // ── Question breakdown
+    // 4. QUESTION BREAKDOWN RENDER
     const list = document.getElementById('breakdownList');
-
     questions.forEach((q, i) => {
       const isCorrect = allAnswers[i] && allAnswers[i].correct;
       const userAns   = allAnswers[i] ? allAnswers[i].chosen : '(timed out)';
@@ -486,19 +221,23 @@
       list.innerHTML = '<p style="color:var(--muted);font-size:0.85rem">No breakdown data available. Play a quiz to see details here.</p>';
     }
 
-    // ── AI performance summary
+    // 5. AI PERFORMANCE SUMMARY (Does not block the rest of the page)
     (async () => {
       try {
-        const summary = await getPerformanceSummary(topic, score, total, wrongQ);
-        document.getElementById('aiSummaryWrap').innerHTML =
-          `<p class="ai-summary-text">"${summary}"</p>`;
-      } catch {
+        if(questions.length > 0) {
+           const summary = await getPerformanceSummary(topic, score, total, wrongQ);
+           document.getElementById('aiSummaryWrap').innerHTML = `<p class="ai-summary-text">"${summary}"</p>`;
+        } else {
+           document.getElementById('aiSummaryWrap').innerHTML = `<p class="ai-summary-text" style="font-style:normal;color:var(--muted)">You scored ${score} out of ${total}. Keep practising!</p>`;
+        }
+      } catch (err) {
+        console.error("AI feedback failed:", err);
         document.getElementById('aiSummaryWrap').innerHTML =
           `<p class="ai-summary-text" style="font-style:normal;color:var(--muted)">You scored ${score} out of ${total}. Keep practising!</p>`;
       }
     })();
 
-    // ── Explain wrong answer
+    // 6. EXPLAIN WRONG ANSWER
     async function explainThis(btn, question, correctAnswer) {
       const textDiv = btn.nextElementSibling;
       if (textDiv.style.display === 'block') { textDiv.style.display = 'none'; btn.textContent = '🤖 Explain this'; return; }
@@ -516,7 +255,7 @@
       btn.disabled = false;
     }
 
-    // ── Share score
+    // 7. SHARE SCORE
     function shareScore() {
       const text = `🧠 BrainBlitz Score\n\n${playerName} scored ${score}/${total} (${pct}%) on "${topic}"!\n${grade.label}\n\nCan you beat it?`;
       navigator.clipboard.writeText(text).then(() => {
